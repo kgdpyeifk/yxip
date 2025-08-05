@@ -29,7 +29,7 @@ jobs:
           cat > format_ip.py << 'EOF'
           import requests
           from collections import defaultdict
-          import time  # 添加时间模块以控制延迟
+          import time
 
           # 从指定 URL 获取 IP 列表
           url = "https://raw.githubusercontent.com/kgdpyeifk/cfipcaiji/refs/heads/main/ip.txt"
@@ -43,31 +43,34 @@ jobs:
               exit(1)
 
           # 使用 ip-api.com 查询 IP 地理位置
-          def get_country_info(ip):
-              try:
-                  api_url = f"http://ip-api.com/json/{ip}"
-                  response = requests.get(api_url, timeout=5).json()
-                  if response['status'] == 'success':
-                      country = response['country']
-                      country_code = response['countryCode'].upper()
-                      flag_map = {
-                          'HK': '🇭🇰', 'TW': '🇹🇼', 'US': '🇺🇸', 'JP': '🇯🇵', 'SG': '🇸🇬',
-                          'KR': '🇰🇷', 'DE': '🇩🇪', 'GB': '🇬🇧', 'FR': '🇫🇷', 'CA': '🇨🇦',
-                          'AU': '🇦🇺', 'IN': '🇮🇳', 'RU': '🇷🇺', 'CN': '🇨🇳'
-                      }
-                      flag = flag_map.get(country_code, '🏳️')
-                      chinese_map = {
-                          'HK': '香港', 'TW': '台湾', 'US': '美国', 'JP': '日本', 'SG': '新加坡',
-                          'KR': '韩国', 'DE': '德国', 'GB': '英国', 'FR': '法国', 'CA': '加拿大',
-                          'AU': '澳大利亚', 'IN': '印度', 'RU': '俄罗斯', 'CN': '中国'
-                      }
-                      chinese_name = chinese_map.get(country_code, f"未知({country_code})")
-                      print(f"查询 {ip} 成功: {flag}{country_code}-{chinese_name}")
-                      time.sleep(0.5)  # 每次请求后延迟 0.5 秒
-                      return flag, country_code, chinese_name
-              except Exception as e:
-                  print(f"查询 {ip} 失败: {e}")
-                  time.sleep(0.5)  # 失败时也延迟，避免触发限制
+          def get_country_info(ip, max_retries=3):
+              for attempt in range(max_retries + 1):
+                  try:
+                      api_url = f"http://ip-api.com/json/{ip}"
+                      response = requests.get(api_url, timeout=5).json()
+                      if response['status'] == 'success':
+                          country = response['country']
+                          country_code = response['countryCode'].upper()
+                          flag_map = {
+                              'HK': '🇭🇰', 'TW': '🇹🇼', 'US': '🇺🇸', 'JP': '🇯🇵', 'SG': '🇸🇬',
+                              'KR': '🇰🇷', 'DE': '🇩🇪', 'GB': '🇬🇧', 'FR': '🇫🇷', 'CA': '🇨🇦',
+                              'AU': '🇦🇺', 'IN': '🇮🇳', 'RU': '🇷🇺', 'CN': '🇨🇳'
+                          }
+                          flag = flag_map.get(country_code, '🏳️')
+                          chinese_map = {
+                              'HK': '香港', 'TW': '台湾', 'US': '美国', 'JP': '日本', 'SG': '新加坡',
+                              'KR': '韩国', 'DE': '德国', 'GB': '英国', 'FR': '法国', 'CA': '加拿大',
+                              'AU': '澳大利亚', 'IN': '印度', 'RU': '俄罗斯', 'CN': '中国'
+                          }
+                          chinese_name = chinese_map.get(country_code, f"未知({country_code})")
+                          print(f"查询 {ip} 成功 (尝试 {attempt + 1}/{max_retries + 1}): {flag}{country_code}-{chinese_name}")
+                          time.sleep(1.5)  # 每次请求后延迟 1.5 秒
+                          return flag, country_code, chinese_name
+                  except Exception as e:
+                      print(f"查询 {ip} 失败 (尝试 {attempt + 1}/{max_retries + 1}): {e}")
+                  if attempt < max_retries:
+                      time.sleep(1)  # 重试前延迟 1 秒
+              print(f"查询 {ip} 最终失败，使用默认值")
               return '🏳️', 'UNK', f"未知({ip})"
 
           # 处理 IP 列表并生成格式化输出
