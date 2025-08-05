@@ -61,6 +61,7 @@ jobs:
                           'AU': '澳大利亚', 'IN': '印度', 'RU': '俄罗斯', 'CN': '中国'
                       }
                       chinese_name = chinese_map.get(country_code, f"未知({country_code})")
+                      print(f"查询 {ip} 成功: {flag}{country_code}-{chinese_name}")  # 调试输出
                       return flag, country_code, chinese_name
               except Exception as e:
                   print(f"查询 {ip} 失败: {e}")
@@ -69,11 +70,11 @@ jobs:
           # 处理 IP 列表并生成格式化输出
           country_ips = defaultdict(list)
           for ip in ip_list:
-              if ':' in ip:  # 确保是 IP:Port 格式
-                  flag, country_code, chinese_name = get_country_info(ip.split(':')[0])
-                  formatted_line = f"{ip}#{flag}{country_code}-{chinese_name}-备用"
-                  country_ips[country_code].append(formatted_line)
-                  print(f"处理 {ip} -> {formatted_line}")  # 调试输出
+              ip_part = ip.split(':')[0] if ':' in ip else ip  # 支持纯 IP 或 IP:Port
+              flag, country_code, chinese_name = get_country_info(ip_part)
+              formatted_line = f"{ip}#{flag}{country_code}-{chinese_name}-备用"
+              country_ips[country_code].append(formatted_line)
+              print(f"处理 {ip} -> {formatted_line}")  # 调试输出
 
           # 限制每个国家前 10 条
           top10_lines = []
