@@ -36,6 +36,7 @@ jobs:
               response = requests.get(url)
               response.raise_for_status()
               ip_list = [line.strip() for line in response.text.splitlines() if line.strip()]
+              print(f"获取到 {len(ip_list)} 个 IP: {ip_list[:5]}...")  # 调试输出前5个IP
           except requests.exceptions.RequestException as e:
               print(f"获取IP列表失败: {e}")
               exit(1)
@@ -48,14 +49,12 @@ jobs:
                   if response['status'] == 'success':
                       country = response['country']
                       country_code = response['countryCode'].upper()
-                      # 简单映射旗帜（使用 Unicode 旗帜符号）
                       flag_map = {
                           'HK': '🇭🇰', 'TW': '🇹🇼', 'US': '🇺🇸', 'JP': '🇯🇵', 'SG': '🇸🇬',
                           'KR': '🇰🇷', 'DE': '🇩🇪', 'GB': '🇬🇧', 'FR': '🇫🇷', 'CA': '🇨🇦',
                           'AU': '🇦🇺', 'IN': '🇮🇳', 'RU': '🇷🇺', 'CN': '🇨🇳'
                       }
                       flag = flag_map.get(country_code, '🏳️')
-                      # 简化的中文名称映射（可扩展）
                       chinese_map = {
                           'HK': '香港', 'TW': '台湾', 'US': '美国', 'JP': '日本', 'SG': '新加坡',
                           'KR': '韩国', 'DE': '德国', 'GB': '英国', 'FR': '法国', 'CA': '加拿大',
@@ -74,21 +73,25 @@ jobs:
                   flag, country_code, chinese_name = get_country_info(ip.split(':')[0])
                   formatted_line = f"{ip}#{flag}{country_code}-{chinese_name}-备用"
                   country_ips[country_code].append(formatted_line)
+                  print(f"处理 {ip} -> {formatted_line}")  # 调试输出
 
           # 限制每个国家前 10 条
           top10_lines = []
           for country_code in country_ips:
               top10_lines.extend(country_ips[country_code][:10])
+          print(f"生成 {len(top10_lines)} 条记录")  # 调试输出
 
           # 保存到 top10.txt
           try:
               with open('top10.txt', 'w', encoding='utf-8') as f:
                   f.write('\n'.join(top10_lines) + '\n')
+              print("top10.txt 已生成")
           except IOError as e:
               print(f"写入文件失败: {e}")
               exit(1)
 
-          print("top10.txt 已生成")
+          if not top10_lines:
+              print("警告: top10_lines 为空，可能存在问题")
           EOF
 
       - name: Run format script
