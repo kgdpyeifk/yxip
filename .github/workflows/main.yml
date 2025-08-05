@@ -31,7 +31,7 @@ jobs:
           import requests
           from collections import defaultdict
           import time
-          from ip2geotools.databases.noncommercial import DbIpCity
+          from ip2geotools.databases.noncommercial import GeoIP
 
           # 从指定 URL 获取 IP 列表
           url = "https://raw.githubusercontent.com/kgdpyeifk/cfipcaiji/refs/heads/main/ip.txt"
@@ -44,10 +44,10 @@ jobs:
               print(f"获取IP列表失败: {e}")
               exit(1)
 
-          # 使用 ip2geotools DbIpCity 查询 IP 地理位置
+          # 使用 ip2geotools GeoIP 查询 IP 地理位置
           def get_country_info(ip):
               try:
-                  response = DbIpCity.get(ip, api_key='free')
+                  response = GeoIP.get(ip)
                   country_code = response.country.upper()
                   chinese_map = {
                       'HK': '香港', 'TW': '台湾', 'US': '美国', 'JP': '日本', 'SG': '新加坡',
