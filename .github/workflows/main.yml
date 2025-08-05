@@ -33,10 +33,13 @@ jobs:
           import time
           from ip2geotools.databases.noncommercial import DbIpCity
 
+          # 设置自定义 User-Agent，符合 Nominatim 使用政策
+          headers = {'User-Agent': 'GitHubAction/1.0 (https://github.com/your-repo)'}
+
           # 从指定 URL 获取 IP 列表
           url = "https://raw.githubusercontent.com/kgdpyeifk/cfipcaiji/refs/heads/main/ip.txt"
           try:
-              response = requests.get(url)
+              response = requests.get(url, headers=headers)
               response.raise_for_status()
               ip_list = [line.strip() for line in response.text.splitlines() if line.strip()]
               print(f"获取到 {len(ip_list)} 个 IP: {ip_list[:5]}...")  # 调试输出前5个IP
@@ -47,7 +50,8 @@ jobs:
           # 使用 ip2geotools DbIpCity 查询 IP 地理位置
           def get_country_info(ip):
               try:
-                  response = DbIpCity.get(ip, api_key='free')
+                  # 强制使用 DbIpCity，本地数据查询
+                  response = DbIpCity.get(ip, api_key='free', timeout=5)
                   country_code = response.country.upper()
                   chinese_map = {
                       'HK': '香港', 'TW': '台湾', 'US': '美国', 'JP': '日本', 'SG': '新加坡',
