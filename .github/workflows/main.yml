@@ -23,7 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests
-          pip install time  # 确保 time 模块可用（Python 标准库中已包含，可忽略）
 
       - name: Create format script
         run: |
