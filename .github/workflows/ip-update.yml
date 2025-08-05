@@ -1,0 +1,33 @@
+name: Update IP Info
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天 00:00 UTC，等于北京时间 08:00
+  workflow_dispatch:
+
+jobs:
+  update-ip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run main script
+        run: python main.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add top10.txt
+          git commit -m "Update top10.txt [bot]" || echo "No changes to commit"
+          git push
