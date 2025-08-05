@@ -3,7 +3,7 @@ import re
 from collections import defaultdict
 
 # 替换为你的 ipinfo.io token
-IPINFO_TOKEN = "YOUR_TOKEN_HERE"
+IPINFO_TOKEN = "325d8a3ddf1192"
 SOURCE_URL = "https://raw.githubusercontent.com/kgdpyeifk/cfipcaiji/refs/heads/main/ip.txt"
 API_URL = "https://ipinfo.io/{ip}?token=" + IPINFO_TOKEN
 
