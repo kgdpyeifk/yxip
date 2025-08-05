@@ -50,8 +50,8 @@ jobs:
           # 使用 ip2geotools DbIpCity 查询 IP 地理位置
           def get_country_info(ip):
               try:
-                  # 强制使用 DbIpCity，本地数据查询
-                  response = DbIpCity.get(ip, api_key='free', timeout=5)
+                  # 移除 timeout 参数
+                  response = DbIpCity.get(ip, api_key='free')
                   country_code = response.country.upper()
                   chinese_map = {
                       'HK': '香港', 'TW': '台湾', 'US': '美国', 'JP': '日本', 'SG': '新加坡',
