@@ -23,12 +23,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests
+          pip install time  # 确保 time 模块可用（Python 标准库中已包含，可忽略）
 
       - name: Create format script
         run: |
           cat > format_ip.py << 'EOF'
           import requests
           from collections import defaultdict
+          import time  # 添加时间模块以控制延迟
 
           # 从指定 URL 获取 IP 列表
           url = "https://raw.githubusercontent.com/kgdpyeifk/cfipcaiji/refs/heads/main/ip.txt"
@@ -61,10 +63,12 @@ jobs:
                           'AU': '澳大利亚', 'IN': '印度', 'RU': '俄罗斯', 'CN': '中国'
                       }
                       chinese_name = chinese_map.get(country_code, f"未知({country_code})")
-                      print(f"查询 {ip} 成功: {flag}{country_code}-{chinese_name}")  # 调试输出
+                      print(f"查询 {ip} 成功: {flag}{country_code}-{chinese_name}")
+                      time.sleep(0.5)  # 每次请求后延迟 0.5 秒
                       return flag, country_code, chinese_name
               except Exception as e:
                   print(f"查询 {ip} 失败: {e}")
+                  time.sleep(0.5)  # 失败时也延迟，避免触发限制
               return '🏳️', 'UNK', f"未知({ip})"
 
           # 处理 IP 列表并生成格式化输出
@@ -74,13 +78,13 @@ jobs:
               flag, country_code, chinese_name = get_country_info(ip_part)
               formatted_line = f"{ip}#{flag}{country_code}-{chinese_name}-备用"
               country_ips[country_code].append(formatted_line)
-              print(f"处理 {ip} -> {formatted_line}")  # 调试输出
+              print(f"处理 {ip} -> {formatted_line}")
 
           # 限制每个国家前 10 条
           top10_lines = []
           for country_code in country_ips:
               top10_lines.extend(country_ips[country_code][:10])
-          print(f"生成 {len(top10_lines)} 条记录")  # 调试输出
+          print(f"生成 {len(top10_lines)} 条记录")
 
           # 保存到 top10.txt
           try:
