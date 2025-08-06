@@ -21,7 +21,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          pip install requests
+          pip install beautifulsoup4  # 添加beautifulsoup4的安装
 
       - name: Run script
         run: python main.py
