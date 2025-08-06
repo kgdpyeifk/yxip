@@ -8,7 +8,7 @@ IPINFO_TOKEN = os.environ.get("IPINFO_TOKEN")
 if not IPINFO_TOKEN:
     raise EnvironmentError("IPINFO_TOKEN is not set in environment variables.")
 
-SOURCE_URL = "https://raw.githubusercontent.com/kgdpyeifk/cfipcaiji/refs/heads/main/ip.txt"
+SOURCE_URL = "https://ip.164746.xyz"
 API_URL = f"https://ipinfo.io/{{ip}}?token={IPINFO_TOKEN}"
 
 # 国家代码映射表（可扩展）
