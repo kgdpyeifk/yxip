@@ -1,6 +1,7 @@
 import requests
 import re
 import os
+import time  # 导入time模块，解决time.sleep(1)报错问题
 from bs4 import BeautifulSoup
 from collections import defaultdict
 
@@ -141,4 +142,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
